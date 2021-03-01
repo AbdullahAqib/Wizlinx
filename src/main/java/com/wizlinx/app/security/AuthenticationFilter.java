@@ -2,6 +2,7 @@ package com.wizlinx.app.security;
 
 
 import java.io.IOException;
+
 import java.util.ArrayList;
 import java.util.Date;
 
@@ -11,6 +12,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
@@ -48,7 +50,7 @@ public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
                             new ArrayList<>())
             );
             
-        } catch (IOException e) {
+        } catch (IOException | AuthenticationException e) {
             throw new RuntimeException(e);
         }
     }
@@ -70,6 +72,14 @@ public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
         
         res.addHeader(SecurityConstants.HEADER_STRING, SecurityConstants.TOKEN_PREFIX + token);
         res.addHeader("UserID", userDto.getUserId());
-    }  
+      
+        res.setContentType("application/json");
+        
+        String objectToReturn = "{ \"token\": \"" + SecurityConstants.TOKEN_PREFIX + token +"\"}";
+        
+        res.getWriter().print(objectToReturn);
+        res.getWriter().flush();
+    } 
+    
 
 }
